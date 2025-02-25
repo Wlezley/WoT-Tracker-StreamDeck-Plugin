@@ -1,41 +1,103 @@
-import { action, KeyDownEvent, SingletonAction, WillAppearEvent } from "@elgato/streamdeck";
-
-/**
- * An example action class that displays a count that increments by one each time the button is pressed.
- */
-@action({ UUID: "com.wlezley-lishack.wot-tracker.increment" })
-export class IncrementCounter extends SingletonAction<CounterSettings> {
-	/**
-	 * The {@link SingletonAction.onWillAppear} event is useful for setting the visual representation of an action when it becomes visible. This could be due to the Stream Deck first
-	 * starting up, or the user navigating between pages / folders etc.. There is also an inverse of this event in the form of {@link streamDeck.client.onWillDisappear}. In this example,
-	 * we're setting the title to the "count" that is incremented in {@link IncrementCounter.onKeyDown}.
-	 */
-	override onWillAppear(ev: WillAppearEvent<CounterSettings>): void | Promise<void> {
-		return ev.action.setTitle(`${ev.payload.settings.count ?? 0}`);
-	}
-
-	/**
-	 * Listens for the {@link SingletonAction.onKeyDown} event which is emitted by Stream Deck when an action is pressed. Stream Deck provides various events for tracking interaction
-	 * with devices including key down/up, dial rotations, and device connectivity, etc. When triggered, {@link ev} object contains information about the event including any payloads
-	 * and action information where applicable. In this example, our action will display a counter that increments by one each press. We track the current count on the action's persisted
-	 * settings using `setSettings` and `getSettings`.
-	 */
-	override async onKeyDown(ev: KeyDownEvent<CounterSettings>): Promise<void> {
-		// Update the count from the settings.
-		const { settings } = ev.payload;
-		settings.incrementBy ??= 1;
-		settings.count = (settings.count ?? 0) + settings.incrementBy;
-
-		// Update the current count in the action's settings, and change the title.
-		await ev.action.setSettings(settings);
-		await ev.action.setTitle(`${settings.count}`);
-	}
-}
+import streamDeck, { action, KeyDownEvent, type DidReceiveSettingsEvent, SingletonAction, WillAppearEvent } from "@elgato/streamdeck";
+import * as fs from 'fs/promises';
 
 /**
  * Settings for {@link IncrementCounter}.
  */
 type CounterSettings = {
 	count?: number;
-	incrementBy?: number;
+	player_id: number;
+	wg_api_id: number;
+	filename: string;
 };
+
+/**
+ * WG API User data structure
+ */
+type WgApiData = {
+	status: "ok";
+	data: Record<number, {
+		private: {
+			gold: number,
+			free_xp: number,
+			credits: number,
+			bonds: number,
+		},
+		global_rating: number,
+		clan_id: number
+	}>;
+};
+
+/**
+ * WG API error structure
+ */
+type WgApiError = {
+	status: "error";
+	error: {
+		field: string,
+		message: string,
+		code: number,
+		value: string
+	};
+}
+
+/**
+ * DeepLink TEST
+ */
+streamDeck.system.onDidReceiveDeepLink((ev) => {
+	const { queryParameters, query, path, fragment } = ev.url;
+
+	streamDeck.logger.info(`Path = ${path}`);
+	streamDeck.logger.info(`Fragment = ${fragment}`);
+	streamDeck.logger.info(`QP = ${query}`);
+	streamDeck.logger.info(`AT = ${queryParameters.get('access_token')}`);
+});
+streamDeck.connect();
+
+@action({ UUID: "com.wlezley-lishack.wot-tracker.increment" })
+export class IncrementCounter extends SingletonAction<CounterSettings> {
+
+	override onWillAppear(ev: WillAppearEvent<CounterSettings>): void | Promise<void> {
+		return ev.action.setTitle(`${ev.payload.settings.count ?? 0}`);
+	}
+
+	override onDidReceiveSettings(ev: DidReceiveSettingsEvent<CounterSettings>): void {
+		// Handle the settings changing in the property inspector (UI).
+		streamDeck.logger.info("SETTINGS CHANGED: ", ev.payload.settings);
+	}
+
+	override async onKeyDown(ev: KeyDownEvent<CounterSettings>): Promise<void> {
+		// streamDeck.system.openUrl("https://elgato.com");
+
+		const { settings } = ev.payload;
+
+		// fs.writeFile(settings.filename, "aaaaaa");
+
+		if (settings.player_id && settings.wg_api_id) {
+			const API_URL = `https://api.worldoftanks.eu/wot/account/info/?application_id=${settings.wg_api_id}&account_id=${settings.player_id}`;
+
+			fetch(API_URL)
+				.then(response => response.json())
+				.then(data => {
+					const apidata = data as WgApiData | WgApiError;
+					// streamDeck.logger.debug(`API DATA`, apidata);
+
+					if (apidata.status == "ok") {
+						if (apidata.data[settings.player_id]) {
+							streamDeck.logger.info(`G_RATING`, apidata.data[settings.player_id].global_rating);
+							streamDeck.logger.info(`CLAN`, apidata.data[settings.player_id].clan_id);
+
+							fs.writeFile(settings.filename, apidata.data[settings.player_id].clan_id.toString());
+						} else {
+							throw "Player not found";
+						}
+					} else {
+						throw apidata.error;
+					}
+				})
+				.catch(error => streamDeck.logger.error("WG API ERROR: ", error));
+		} else {
+			streamDeck.logger.error("Neni to vyplněný!");
+		}
+	}
+}

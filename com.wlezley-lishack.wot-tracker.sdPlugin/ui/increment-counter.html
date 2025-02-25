@@ -11,8 +11,19 @@
     <!--
         Learn more about property inspector components at https://sdpi-components.dev/docs/components
     -->
-    <sdpi-item label="Increment By">
-        <sdpi-range setting="incrementBy" min="1" max="5" step="1" default="1" showlabels></sdpi-range>
+    <sdpi-item label="Player ID">
+        <sdpi-textfield setting="player_id" required></sdpi-textfield>
+    </sdpi-item>
+    <sdpi-item label="WG API ID">
+        <sdpi-password setting="wg_api_id" required></sdpi-password>
+    </sdpi-item>
+    <sdpi-item label="File">
+        <sdpi-file setting="filename" accept="text/plain"></sdpi-file>
+    </sdpi-item>
+    <sdpi-item>
+        <sdpi-button onclick="javascript:alert('Hello World')">
+            WG API Auth
+        </sdpi-button>
     </sdpi-item>
 </body>
 
