@@ -5,19 +5,7 @@
     <title>WG API Settings</title>
     <meta charset="utf-8" />
     <script src="https://sdpi-components.dev/releases/v3/sdpi-components.js"></script>
-    <script>
-        function authenticateWGAPI() {
-            const application_id = document.querySelector('[setting="application_id"]').value;
-            if (!application_id) {
-                alert("Error WG API ID is empty.");
-                return;
-            }
-            SDPIComponents.streamDeckClient.setGlobalSettings({
-                command: "startAuth",
-                application_id: application_id
-            });
-        }
-    </script>
+    <script src="./wg-api.js"></script>
 </head>
 
 <body>

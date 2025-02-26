@@ -5,17 +5,18 @@
 	"Actions": [
 		{
 			"Name": "WG API TEST",
-			"UUID": "com.wlezley-lishack.wot-tracker.increment",
-			"Icon": "imgs/actions/counter/icon",
-			"Tooltip": "Displays a count, which increments by one on press.",
-			"PropertyInspectorPath": "ui/increment-counter.html",
+			"UUID": "com.wlezley-lishack.wot-tracker.default",
+			"Icon": "imgs/actions/default/icon",
+			"Tooltip": "Basic testing plugin action (for debug)",
+			"PropertyInspectorPath": "ui/default.html",
 			"Controllers": [
 				"Keypad"
 			],
 			"States": [
 				{
-					"Image": "imgs/actions/counter/key",
-					"TitleAlignment": "middle"
+					"Image": "imgs/actions/default/key",
+					"TitleAlignment": "middle",
+					"FontSize": 14
 				}
 			]
 		}

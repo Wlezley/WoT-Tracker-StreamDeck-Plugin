@@ -5,21 +5,17 @@ import WotAccountInfo from "WotAccountInfo";
 import WgApiError from "WgApiError";
 import { SettingsSchema } from "../plugin";
 
-/**
- * Settings for {@link IncrementCounter}.
- */
 type PluginSettings = {
-	count?: number;
 	account_id: number;
 	application_id: string;
 	filename: string;
 };
 
-@action({ UUID: "com.wlezley-lishack.wot-tracker.increment" })
-export class IncrementCounter extends SingletonAction<PluginSettings> {
+@action({ UUID: "com.wlezley-lishack.wot-tracker.default" })
+export class DefaultAction extends SingletonAction<PluginSettings> {
 
 	override onWillAppear(ev: WillAppearEvent<PluginSettings>): void | Promise<void> {
-		return ev.action.setTitle(`${ev.payload.settings.count ?? 'WoT'}`);
+		return ev.action.setTitle('WoT');
 	}
 
 	override onDidReceiveSettings(ev: DidReceiveSettingsEvent<PluginSettings>): void {
