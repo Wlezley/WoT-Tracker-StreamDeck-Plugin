@@ -1,6 +1,9 @@
 import streamDeck, { action, KeyDownEvent, type DidReceiveSettingsEvent, SingletonAction, WillAppearEvent } from "@elgato/streamdeck";
 import * as fs from 'fs/promises';
 
+import WotAccountInfo from "WotAccountInfo";
+import WgApiError from "WgApiError";
+
 /**
  * Settings for {@link IncrementCounter}.
  */
@@ -10,36 +13,6 @@ type CounterSettings = {
 	wg_api_id: number;
 	filename: string;
 };
-
-/**
- * WG API User data structure
- */
-type WgApiData = {
-	status: "ok";
-	data: Record<number, {
-		private: {
-			gold: number,
-			free_xp: number,
-			credits: number,
-			bonds: number,
-		},
-		global_rating: number,
-		clan_id: number
-	}>;
-};
-
-/**
- * WG API error structure
- */
-type WgApiError = {
-	status: "error";
-	error: {
-		field: string,
-		message: string,
-		code: number,
-		value: string
-	};
-}
 
 /**
  * DeepLink TEST
@@ -52,7 +25,6 @@ streamDeck.system.onDidReceiveDeepLink((ev) => {
 	streamDeck.logger.info(`QP = ${query}`);
 	streamDeck.logger.info(`AT = ${queryParameters.get('access_token')}`);
 });
-streamDeck.connect();
 
 @action({ UUID: "com.wlezley-lishack.wot-tracker.increment" })
 export class IncrementCounter extends SingletonAction<CounterSettings> {
@@ -79,7 +51,7 @@ export class IncrementCounter extends SingletonAction<CounterSettings> {
 			fetch(API_URL)
 				.then(response => response.json())
 				.then(data => {
-					const apidata = data as WgApiData | WgApiError;
+					const apidata = data as WotAccountInfo.ApiResponse | WgApiError.ApiResponse;
 					// streamDeck.logger.debug(`API DATA`, apidata);
 
 					if (apidata.status == "ok") {
