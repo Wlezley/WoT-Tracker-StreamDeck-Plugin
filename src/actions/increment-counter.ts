@@ -14,18 +14,6 @@ type CounterSettings = {
 	filename: string;
 };
 
-/**
- * DeepLink TEST
- */
-streamDeck.system.onDidReceiveDeepLink((ev) => {
-	const { queryParameters, query, path, fragment } = ev.url;
-
-	streamDeck.logger.info(`Path = ${path}`);
-	streamDeck.logger.info(`Fragment = ${fragment}`);
-	streamDeck.logger.info(`QP = ${query}`);
-	streamDeck.logger.info(`AT = ${queryParameters.get('access_token')}`);
-});
-
 @action({ UUID: "com.wlezley-lishack.wot-tracker.increment" })
 export class IncrementCounter extends SingletonAction<CounterSettings> {
 
