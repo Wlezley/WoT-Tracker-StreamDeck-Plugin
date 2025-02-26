@@ -5,23 +5,30 @@
     <title>WG API Settings</title>
     <meta charset="utf-8" />
     <script src="https://sdpi-components.dev/releases/v3/sdpi-components.js"></script>
+    <script>
+        function authenticateWGAPI() {
+            const application_id = document.querySelector('[setting="application_id"]').value;
+            if (!application_id) {
+                alert("Error WG API ID is empty.");
+                return;
+            }
+            SDPIComponents.streamDeckClient.setGlobalSettings({
+                command: "startAuth",
+                application_id: application_id
+            });
+        }
+    </script>
 </head>
 
 <body>
-    <!--
-        Learn more about property inspector components at https://sdpi-components.dev/docs/components
-    -->
-    <sdpi-item label="Player ID">
-        <sdpi-textfield setting="player_id" required></sdpi-textfield>
-    </sdpi-item>
-    <sdpi-item label="WG API ID">
-        <sdpi-password setting="wg_api_id" required></sdpi-password>
-    </sdpi-item>
     <sdpi-item label="File">
         <sdpi-file setting="filename" accept="text/plain"></sdpi-file>
     </sdpi-item>
+    <sdpi-item label="WG API ID">
+        <sdpi-password setting="application_id" required></sdpi-password>
+    </sdpi-item>
     <sdpi-item>
-        <sdpi-button onclick="javascript:alert('Hello World')">
+        <sdpi-button onclick="authenticateWGAPI()">
             WG API Auth
         </sdpi-button>
     </sdpi-item>
