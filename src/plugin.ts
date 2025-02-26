@@ -25,9 +25,9 @@ app.get("/auth", (req: Request, res: Response) => {
         };
         streamDeck.settings.setGlobalSettings(authSettings);
         streamDeck.logger.info("WG API Auth settings: ", authSettings);
-        res.send("<br /><br /><br /><br /><h1><center>Autorizace úspěšná, můžete zavřít tuto stránku.</center></h1>");
+        res.send('<br /><br /><br /><br /><h1><center>Autorizace úspěšná, můžete zavřít tuto stránku.</center></h1>');
     } else {
-        res.send("Autorizace selhala, zkuste to znovu.");
+        res.send('<br /><br /><br /><br /><h1 style="color: red;"><center>Autorizace selhala, zkuste to znovu.</center></h1>');
     }
 });
 

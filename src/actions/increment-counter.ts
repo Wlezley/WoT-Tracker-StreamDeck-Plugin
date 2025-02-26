@@ -44,9 +44,13 @@ export class IncrementCounter extends SingletonAction<PluginSettings> {
 
 					if (apidata.status == "ok") {
 						if (apidata.data[globalSettings.account_id]) {
-							streamDeck.logger.info(`G_RATING`, apidata.data[globalSettings.account_id].global_rating);
-							streamDeck.logger.info(`CLAN`, apidata.data[globalSettings.account_id].clan_id);
+							streamDeck.logger.info(`GLOBAL_RATING`, apidata.data[globalSettings.account_id].global_rating);
+							streamDeck.logger.info(`TREES_CUT`, apidata.data[globalSettings.account_id].statistics.trees_cut);
+							streamDeck.logger.info(`CLAN_ID`, apidata.data[globalSettings.account_id].clan_id);
 							streamDeck.logger.info(`CREDITS`, apidata.data[globalSettings.account_id].private.credits);
+							streamDeck.logger.info(`GOLD`, apidata.data[globalSettings.account_id].private.gold);
+							streamDeck.logger.info(`BONDS`, apidata.data[globalSettings.account_id].private.bonds);
+							streamDeck.logger.info(`FREE_XP`, apidata.data[globalSettings.account_id].private.free_xp);
 
 							if (settings.filename) {
 								fs.writeFile(settings.filename, apidata.data[globalSettings.account_id].private.credits.toString());
